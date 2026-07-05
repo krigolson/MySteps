@@ -2,71 +2,71 @@ import SwiftUI
 import Charts
 
 struct StepChartsView: View {
+    let mode: MetricMode
     @EnvironmentObject var hk: HealthKitManager
 
-    var body: some View {
-        ZStack {
-            Tron.bg.ignoresSafeArea()
+    private var weekData:  [(date: Date, value: Double)] { mode == .steps ? hk.weekDailySteps  : hk.weekDailyHR  }
+    private var monthData: [(date: Date, value: Double)] { mode == .steps ? hk.monthDailySteps : hk.monthDailyHR }
+    private var yearData:  [(date: Date, value: Double)] { mode == .steps ? hk.yearMonthlySteps : hk.yearMonthlyHR }
 
-            if hk.weekDailySteps.isEmpty && hk.monthDailySteps.isEmpty {
-                ProgressView().tint(Tron.cyan)
-            } else {
-                ScrollView(showsIndicators: false) {
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                Tron.bg.ignoresSafeArea()
+
+                if weekData.isEmpty && monthData.isEmpty {
+                    ProgressView().tint(mode.accent)
+                } else {
+                    let available = geo.size.height - 56 - 40 // top tag + bottom dots
+                    let chartH    = available / 3 - 24        // minus label
+
                     VStack(spacing: 0) {
-                        chartSection(
-                            title: "LAST 7 DAYS",
-                            data: hk.weekDailySteps,
-                            xLabel: { d in shortDay(d) },
-                            isTop: true
-                        )
+                        modeTag.padding(.top, 56).padding(.bottom, 4)
+
+                        chartPanel(title: "LAST 7 DAYS",    data: weekData,  chartH: chartH, xFmt: shortDay)
                         TronDivider()
-                        chartSection(
-                            title: "LAST 30 DAYS",
-                            data: hk.monthDailySteps,
-                            xLabel: { d in shortDate(d) },
-                            isTop: false
-                        )
+                        chartPanel(title: "LAST 30 DAYS",   data: monthData, chartH: chartH, xFmt: shortDate)
                         TronDivider()
-                        chartSection(
-                            title: "LAST 12 MONTHS",
-                            data: hk.yearMonthlySteps,
-                            xLabel: { d in shortMonth(d) },
-                            isTop: false
-                        )
+                        chartPanel(title: "LAST 12 MONTHS", data: yearData,  chartH: chartH, xFmt: shortMonth)
+
+                        Spacer(minLength: 40)
                     }
-                    .padding(.bottom, 50)
                 }
             }
         }
     }
 
-    // MARK: - Section Builder
+    private var modeTag: some View {
+        HStack(spacing: 6) {
+            Image(systemName: mode.icon).font(.caption)
+            Text("CHARTS  ·  \(mode.label)").font(.caption.monospaced()).tracking(2)
+        }
+        .foregroundStyle(mode.accent)
+        .tronGlow(color: mode.accent, radius: 4)
+    }
 
-    private func chartSection(
+    private func chartPanel(
         title: String,
-        data: [(date: Date, steps: Double)],
-        xLabel: @escaping (Date) -> String,
-        isTop: Bool
+        data: [(date: Date, value: Double)],
+        chartH: CGFloat,
+        xFmt: @escaping (Date) -> String
     ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.caption.monospaced())
-                .tracking(4)
-                .foregroundStyle(Tron.dimCyan)
+                .font(.system(size: 9, weight: .medium, design: .monospaced))
+                .foregroundStyle(mode.dimAccent)
+                .tracking(3)
+                .padding(.horizontal, 16)
 
-            let maxVal = data.map(\.steps).max() ?? 1
+            let maxVal = max(data.map(\.value).max() ?? 1, 1)
 
             Chart(data, id: \.date) { item in
                 BarMark(
-                    x: .value("Date", xLabel(item.date)),
-                    y: .value("Steps", item.steps)
+                    x: .value("Date", xFmt(item.date)),
+                    y: .value("Value", item.value)
                 )
                 .foregroundStyle(
-                    LinearGradient(
-                        colors: [Tron.blue, Tron.cyan],
-                        startPoint: .bottom,
-                        endPoint: .top
-                    )
+                    LinearGradient(colors: [mode.dimAccent, mode.accent], startPoint: .bottom, endPoint: .top)
                 )
                 .cornerRadius(2)
             }
@@ -76,9 +76,9 @@ struct StepChartsView: View {
                         .foregroundStyle(Tron.rule)
                     AxisValueLabel {
                         if let v = val.as(Double.self) {
-                            Text(compactSteps(v))
-                                .font(.caption2.monospaced())
-                                .foregroundStyle(Tron.dimCyan.opacity(0.8))
+                            Text(compact(v))
+                                .font(.system(size: 8, design: .monospaced))
+                                .foregroundStyle(mode.dimAccent.opacity(0.9))
                         }
                     }
                 }
@@ -88,34 +88,27 @@ struct StepChartsView: View {
                     AxisValueLabel {
                         if let s = val.as(String.self) {
                             Text(s)
-                                .font(.caption2.monospaced())
-                                .foregroundStyle(Tron.dimCyan.opacity(0.8))
+                                .font(.system(size: 8, design: .monospaced))
+                                .foregroundStyle(mode.dimAccent.opacity(0.9))
                         }
                     }
                 }
             }
-            .chartPlotStyle { plot in
-                plot.background(Tron.bgCard)
-            }
-            .frame(height: 140)
+            .chartPlotStyle { $0.background(Tron.bgCard) }
+            .frame(height: chartH)
+            .padding(.horizontal, 12)
         }
-        .padding(.horizontal, 16)
-        .padding(.top, isTop ? 56 : 20)
-        .padding(.bottom, 16)
+        .padding(.top, 8)
     }
 
-    // MARK: - Formatters
+    private func shortDay(_ d: Date) -> String   { DateFormatter().then { $0.dateFormat = "EEE" }.string(from: d) }
+    private func shortDate(_ d: Date) -> String  { DateFormatter().then { $0.dateFormat = "M/d"  }.string(from: d) }
+    private func shortMonth(_ d: Date) -> String { DateFormatter().then { $0.dateFormat = "MMM"  }.string(from: d) }
+    private func compact(_ v: Double) -> String  { v >= 1000 ? String(format: "%.0fk", v/1000) : String(format: "%.0f", v) }
+}
 
-    private func shortDay(_ date: Date) -> String {
-        let f = DateFormatter(); f.dateFormat = "EEE"; return f.string(from: date)
-    }
-    private func shortDate(_ date: Date) -> String {
-        let f = DateFormatter(); f.dateFormat = "M/d"; return f.string(from: date)
-    }
-    private func shortMonth(_ date: Date) -> String {
-        let f = DateFormatter(); f.dateFormat = "MMM"; return f.string(from: date)
-    }
-    private func compactSteps(_ v: Double) -> String {
-        v >= 1000 ? String(format: "%.0fk", v / 1000) : String(format: "%.0f", v)
+private extension DateFormatter {
+    func then(_ configure: (DateFormatter) -> Void) -> DateFormatter {
+        configure(self); return self
     }
 }

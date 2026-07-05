@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		11DBDC665E7FC10262D12A34 /* MainStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09BFF2ECB81D7515FE67F4B /* MainStatsView.swift */; };
+		4944477A831BB2F66FF73B49 /* MetricMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0813D90C6D869900242E1CBE /* MetricMode.swift */; };
 		5BD8B5BD58B4209F86F7249B /* MyStepsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 173088188EB1E53E6C3E6E3F /* MyStepsApp.swift */; };
 		6B3DD576947510DA5E57867C /* TronTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100AC7A71F75E86262A6E1D0 /* TronTheme.swift */; };
 		719880FDA7CF9FBE4835993B /* StepChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36A90C0322E229C0B966380F /* StepChartsView.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0813D90C6D869900242E1CBE /* MetricMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricMode.swift; sourceTree = "<group>"; };
 		0E1D430BF16BF6641AE6427E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		100AC7A71F75E86262A6E1D0 /* TronTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TronTheme.swift; sourceTree = "<group>"; };
 		173088188EB1E53E6C3E6E3F /* MyStepsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyStepsApp.swift; sourceTree = "<group>"; };
@@ -46,6 +48,7 @@
 				4FE3AA229E2FCD69B75DB759 /* HealthKitManager.swift */,
 				A67E3808D2E0933BA0C85158 /* Info.plist */,
 				A09BFF2ECB81D7515FE67F4B /* MainStatsView.swift */,
+				0813D90C6D869900242E1CBE /* MetricMode.swift */,
 				8AD1683D5C791E6FBB483629 /* MySteps.entitlements */,
 				173088188EB1E53E6C3E6E3F /* MyStepsApp.swift */,
 				36A90C0322E229C0B966380F /* StepChartsView.swift */,
@@ -124,6 +127,7 @@
 				B2B60A7FA5BF4D52DD50EE84 /* FunStatsView.swift in Sources */,
 				EF99926359D6F5FEE9955079 /* HealthKitManager.swift in Sources */,
 				11DBDC665E7FC10262D12A34 /* MainStatsView.swift in Sources */,
+				4944477A831BB2F66FF73B49 /* MetricMode.swift in Sources */,
 				5BD8B5BD58B4209F86F7249B /* MyStepsApp.swift in Sources */,
 				719880FDA7CF9FBE4835993B /* StepChartsView.swift in Sources */,
 				6B3DD576947510DA5E57867C /* TronTheme.swift in Sources */,
